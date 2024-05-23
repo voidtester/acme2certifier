@@ -110,6 +110,7 @@ class Authorization(object):
         self.logger.debug('Authorization._authz_info()')
 
         authz_name = string_sanitize(self.logger, url.replace(f'{self.server_name}{self.path_dic["authz_path"]}', ''))
+        print(authz_name,"authz_______name")
         self.logger.debug('Authorization._authz_info(%s)', authz_name)
 
         expires = uts_now() + self.validity
@@ -118,7 +119,7 @@ class Authorization(object):
 
         # lookup authorization based on name
         authz = self._authz_lookup(authz_name)
-
+        print(authz,"authz______________==")
         if authz:
             # update authorization with expiry date and token (just to be sure)
             self._expiry_update(authz_name, token, expires)
@@ -127,7 +128,7 @@ class Authorization(object):
             # get authorization information from db to be inserted in message
             tnauth = False
             auth_info = self._authz_lookup(authz_name, ['status__name', 'type', 'value'])
-
+            print(auth_info,"===auth info")
             if auth_info:
                 (authz_info_dic, tnauth) = self._authz_info_dic_update(authz_info_dic, auth_info)
             else:
@@ -211,6 +212,7 @@ class Authorization(object):
         if code == 200:
             if 'url' in protected:
                 auth_info = self._authz_info(protected['url'])
+                print(auth_info)
                 if auth_info:
                     response_dic['data'] = auth_info
                 else:

@@ -22,7 +22,7 @@ class Challenge(object):
         self.path_dic = {'chall_path': '/acme/chall/', 'authz_path': '/acme/authz/'}
         self.err_msg_dic = error_dic_get(self.logger)
         self.expiry = expiry
-        self.challenge_validation_disable = False
+        self.challenge_validation_disable = True
         self.challenge_validation_timeout = 10
         self.dns_validation_pause_timer = 0.5
         self.tnauthlist_support = False
@@ -44,6 +44,7 @@ class Challenge(object):
 
         try:
             challenge_list = self.dbstore.challenges_search(key, value, vlist)
+            print(challenge_list)
         except Exception as err_:
             self.logger.critical('acme2certifier database error in Challenge._challengelist_search(): %s', err_)
             challenge_list = []
@@ -568,7 +569,7 @@ class Challenge(object):
 
         # check database if there are exsting challenges for a particular authorization
         challenge_list = self._challengelist_search('authorization__name', authz_name)
-
+        print(challenge_list)
         if challenge_list:
             self.logger.debug('Challenges found.')
             # trigger challenge validation
@@ -584,6 +585,7 @@ class Challenge(object):
             self.logger.debug('Challenges not found. Create a new set.')
             challenge_list = self.new_set(authz_name, token, tnauth, id_type, id_value)
 
+        
         return challenge_list
 
     def get(self, url: str) -> Dict[str, str]:
