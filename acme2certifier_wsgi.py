@@ -479,5 +479,5 @@ if __name__ == '__main__':
     # check configuration for parameters masked in ""
     config_check(LOGGER, CONFIG)  # pragma: no cover
 
-    SRV = make_server('0.0.0.0', 80, application, handler_class=get_handler_cls())  # pragma: no cover
+    SRV = make_server('0.0.0.0', 8080, application, handler_class=get_handler_cls())  # pragma: no cover
     SRV.serve_forever()  # pragma: no cover
