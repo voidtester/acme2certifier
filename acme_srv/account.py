@@ -7,7 +7,7 @@ from acme_srv.helper import generate_random_string, validate_email, date_to_date
 from acme_srv.db_handler import DBstore
 from acme_srv.message import Message
 from acme_srv.signature import Signature
-
+from acme_srv.eab_handler import EABhandler
 
 class Account(object):
     """ ACME server class """
@@ -24,8 +24,8 @@ class Account(object):
         self.tos_check_disable = False
         self.inner_header_nonce_allow = False
         self.tos_url = None
-        self.eab_check = False
-        self.eab_handler = None
+        self.eab_check = True
+        self.eab_handler = EABhandler()
 
     def __enter__(self):
         """ Makes ACMEHandler a Context Manager """
@@ -304,7 +304,7 @@ class Account(object):
     def _eab_check(self, protected: Dict[str, str], payload: Dict[str, str]) -> Tuple[int, str, str]:
         """" check for external account binding """
         self.logger.debug('Account._eab_check()')
-
+ 
         if self.eab_handler and protected and payload and 'externalaccountbinding' in payload and payload['externalaccountbinding']:
             # compare JWK from protected (outer) header if jwk included in payload of external account binding
             jwk_compare = self._eab_jwk_compare(protected, payload['externalaccountbinding']['payload'])

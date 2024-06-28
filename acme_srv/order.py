@@ -551,7 +551,7 @@ class Order(object):
         if code == 200:
 
             # parse message
-            (code, message, detail, certificate_name, order_name) = self._parse(protected, payload, header)
+            (code, message, detail, certificate_name, order_name) = self. _parse(protected, payload, header)
 
             if code == 200:
                 # create response

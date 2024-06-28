@@ -26,7 +26,7 @@ class Directory(object):
         self.version = __version__
         self.dbversion = __dbversion__
         self.db_check = False
-        self.eab = False
+        self.eab = True
         self.url_prefix = ""
 
     def __enter__(self):
@@ -48,8 +48,8 @@ class Directory(object):
                 self.tos_url = config_dic['Directory']['tos_url']
             if 'db_check' in config_dic['Directory']:
                 self.db_check = config_dic.getboolean('Directory', 'db_check', fallback=False)
-        if 'EABhandler' in config_dic and 'eab_handler_file' in config_dic['EABhandler']:
-            self.eab = True
+        #if 'EABhandler' in config_dic and 'eab_handler_file' in config_dic['EABhandler']:
+        #    self.eab = True
         if 'Directory' in config_dic and 'url_prefix' in config_dic['Directory']:
             self.url_prefix = config_dic['Directory']['url_prefix']
 
@@ -80,12 +80,12 @@ class Directory(object):
         if not self.suppress_product_information:
             d_dic['meta'] = {
                 'home': self.home,
-                'author': 'grindsa <grindelsack@gmail.com>',
-                'name': 'acme2certifier'
+                'author': 'Encryption Consulting LLC.',
+                'name': 'ACME Server Home'
             }
             # show version information in meta tags if not disabled....
-            if not self.supress_version:
-                d_dic['meta']['version'] = self.version
+            # if not self.supress_version:
+            #     d_dic['meta']['version'] = self.version
         else:
             if self.home != GH_HOME:
                 d_dic['meta']['home'] = self.home

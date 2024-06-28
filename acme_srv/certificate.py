@@ -8,7 +8,7 @@ from acme_srv.helper import b64_url_recode, generate_random_string, cert_cn_get,
 from acme_srv.db_handler import DBstore
 from acme_srv.message import Message
 from acme_srv.threadwithreturnvalue import ThreadWithReturnValue
-from acme_srv.ca_handler import CAhandler
+from acme_srv.certsecure_handler import CAhandler
 
 class Certificate(object):
     """ CA  handler """
@@ -286,10 +286,15 @@ class Certificate(object):
         else:
             certificate = None
             certificate_raw = None
-
+            error=None
+            poll_identifier=""
+        
         if not certificate or not certificate_raw:
+           
+            print("in not cert")
             self.logger.debug('Certificate._enroll(): trigger enrollment')
             (error, certificate, certificate_raw, poll_identifier) = ca_handler.enroll(csr)
+               
         else:
             self.logger.info('Certificate._enroll(): reuse existing certificate')
 
@@ -400,7 +405,7 @@ class Certificate(object):
             return hook_error
 
         with self.cahandler(self.debug, self.logger) as ca_handler:
-
+            print("ca handler is ", ca_handler)
             # enroll certificate
             (error, certificate, certificate_raw, poll_identifier) = self._enroll(csr, ca_handler)
 

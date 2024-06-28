@@ -22,7 +22,7 @@ class Challenge(object):
         self.path_dic = {'chall_path': '/acme/chall/', 'authz_path': '/acme/authz/'}
         self.err_msg_dic = error_dic_get(self.logger)
         self.expiry = expiry
-        self.challenge_validation_disable = True
+        self.challenge_validation_disable = False
         self.challenge_validation_timeout = 10
         self.dns_validation_pause_timer = 0.5
         self.tnauthlist_support = False

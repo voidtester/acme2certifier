@@ -22,6 +22,8 @@ import logging
 import hashlib
 import html
 from urllib3.contrib import pyopenssl as urllib3_cn
+from urllib3.contrib import pyopenssl as urllib3_cn
+
 import ipaddress
 from urllib.parse import urlparse, quote
 from urllib3.util import connection
@@ -481,15 +483,17 @@ def convert_string_to_byte(value: str) -> bytes:
         result = value
     return result
 
-
 def csr_load(logger: logging.Logger, csr: str) -> x509.CertificateSigningRequest:
-    """ load certificate object from pem _Format """
-    logger.debug('cert_load()')
-
-    pem_data = convert_string_to_byte(build_pem_file(logger, None, b64_url_recode(logger, csr), True, True))
-    csr_data = x509.load_pem_x509_csr(pem_data)
-
-    return csr_data
+    """Load certificate object from PEM format."""
+    logger.debug('csr_load()')
+    try:
+        pem_data = convert_string_to_byte(build_pem_file(logger, None, b64_url_recode(logger, csr), True, csr=True))
+        csr_data = x509.load_pem_x509_csr(pem_data, default_backend())
+        logger.debug('csr_load(): Successfully loaded CSR')
+        return csr_data
+    except Exception as err:
+        logger.error('csr_load(): Error loading CSR: %s', err)
+        raise
 
 
 def csr_cn_get(logger: logging.Logger, csr_pem: str) -> str:
@@ -549,27 +553,21 @@ def csr_pubkey_get(logger, csr, encoding='pem'):
 
 
 def csr_san_get(logger: logging.Logger, csr: str) -> List[str]:
-    """ get subject alternate names from certificate """
-    logger.debug('cert_san_get()')
+    """Get subject alternative names from certificate."""
+    logger.debug('csr_san_get()')
     sans = []
     if csr:
-
-        csr_obj = csr_load(logger, csr)
-        sans = []
         try:
+            csr_obj = csr_load(logger, csr)
             ext = csr_obj.extensions.get_extension_for_oid(x509.OID_SUBJECT_ALTERNATIVE_NAME)
-
-            sans_list = ext.value.get_values_for_type(x509.DNSName)
-            for san in sans_list:
-                sans.append(f'DNS:{san}')
-            sans_list = ext.value.get_values_for_type(x509.IPAddress)
-            for san in sans_list:
-                sans.append(f'IP:{san}')
-
+            print(ext,"csr extensions printed" )
+            sans = [f'DNS:{san}' for san in ext.value.get_values_for_type(x509.DNSName)]
+            sans.extend([f'IP:{san}' for san in ext.value.get_values_for_type(x509.IPAddress)])
+        except x509.ExtensionNotFound:
+            logger.warning('csr_san_get(): No subjectAltName extension found in CSR')
         except Exception as err:
             logger.error('csr_san_get(): Error: %s', err)
-
-    logger.debug('csr_san_get() ended with: %s', str(sans))
+    logger.debug('csr_san_get() ended with: %s', sans)
     return sans
 
 
@@ -1144,6 +1142,7 @@ def url_get_with_default_dns(logger: logging.Logger, url: str, proxy_list: Dict[
 
     try:
         req = requests.get(url, verify=verify, timeout=timeout, headers=headers, proxies=proxy_list)
+        print(req)
         result = req.text
     except Exception as err_:
         logger.debug('url_get(%s): error', err_)
